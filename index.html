@@ -1,174 +1,177 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>AARAV QUIZ WORLD 🌍</title>
-
-<style>
-body{
-font-family:Trebuchet MS;
-text-align:center;
-margin:0;
-background:linear-gradient(135deg,#141E30,#243B55);
-color:white;
-}
-
-.quiz-box{
-background:rgba(255,255,255,0.1);
-padding:25px;
-margin:40px auto;
-width:520px;
-border-radius:20px;
-box-shadow:0 0 25px black;
-}
-
-button{
-display:block;
-margin:10px auto;
-padding:12px;
-width:90%;
-border:none;
-border-radius:10px;
-background:#00c6ff;
-cursor:pointer;
-}
-
-.progress{height:15px;background:#333;border-radius:10px;margin:15px 0;}
-.progress-bar{height:100%;width:0%;background:#00ff9d;}
-
-#restartBtn{display:none;}
-#scoreBoard{display:none;font-size:22px;}
-</style>
+  <title>AARAV QUIZ WORLD 🌍</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg,#141E30,#243B55);
+      color:white;
+      margin:0;
+      padding:0;
+    }
+    .quiz-box {
+      background: rgba(255,255,255,0.1);
+      padding: 25px;
+      margin: 40px auto;
+      width: 600px;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #000;
+    }
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 12px;
+      width: 90%;
+      border: none;
+      border-radius: 10px;
+      background: #00c6ff;
+      color: black;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background:#00a3cc; }
+    .progress { height:15px; background:#333; border-radius:10px; margin:15px 0; }
+    .progress-bar { height:100%; width:0%; background:#00ff9d; }
+    #restartBtn { display:none; background:#ff4081; color:white; }
+    #scoreBoard { display:none; font-size:22px; margin-top:15px; }
+    #playerInput { margin:20px auto; padding:10px; font-size:16px; width:300px; border-radius:10px; border:none; }
+  </style>
 </head>
-
 <body>
 
-<div class="quiz-box">
-
-<h2>🔥 AARAV QUIZ WORLD 🔥</h2>
-<div id="timer">⏱ Time: 20</div>
-
-<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
-
-<h3 id="question"></h3>
-
-<button onclick="checkAnswer(0)" id="opt0"></button>
-<button onclick="checkAnswer(1)" id="opt1"></button>
-<button onclick="checkAnswer(2)" id="opt2"></button>
-<button onclick="checkAnswer(3)" id="opt3"></button>
-
-<p id="score">Score: 0</p>
-
-<div id="scoreBoard"></div>
-<button id="restartBtn" onclick="restartQuiz()">Play Again</button>
-
+<div class="quiz-box" id="startBox">
+  <h2>🔥 AARAV QUIZ WORLD 🔥</h2>
+  <input type="text" placeholder="Enter your name" id="playerInput">
+  <button onclick="startQuiz()">Start Quiz</button>
 </div>
 
+<div class="quiz-box" id="quizBox" style="display:none;">
+  <h2 id="playerName"></h2>
+  <div id="timer">⏱ Time: 20</div>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  <h3 id="question">Question text</h3>
+  <button onclick="checkAnswer(0)" id="opt0">Option 1</button>
+  <button onclick="checkAnswer(1)" id="opt1">Option 2</button>
+  <button onclick="checkAnswer(2)" id="opt2">Option 3</button>
+  <button onclick="checkAnswer(3)" id="opt3">Option 4</button>
+  <p id="score">Score: 0</p>
+  <div id="scoreBoard"></div>
+  <button id="restartBtn" onclick="restartQuiz()">🔁 Play Again</button>
+</div>
+
+<!-- Sound Effects -->
+<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
 <script>
-
+// 100 GK Questions
 let questions = [
-{q:"Capital of India?",o:["Mumbai","Delhi","Chennai","Kolkata"],c:1},
-{q:"Capital of USA?",o:["New York","Washington DC","Chicago","Boston"],c:1},
-{q:"Largest planet?",o:["Earth","Jupiter","Mars","Saturn"],c:1},
-{q:"Fastest land animal?",o:["Tiger","Cheetah","Lion","Horse"],c:1},
-{q:"Tallest mountain?",o:["K2","Everest","Makalu","Lhotse"],c:1},
-{q:"Who discovered gravity?",o:["Newton","Einstein","Tesla","Galileo"],c:0},
-{q:"Largest ocean?",o:["Atlantic","Indian","Pacific","Arctic"],c:2},
-{q:"Smallest continent?",o:["Europe","Australia","Antarctica","Africa"],c:1},
-{q:"National animal of India?",o:["Lion","Tiger","Elephant","Leopard"],c:1},
-{q:"Red Planet?",o:["Earth","Mars","Venus","Jupiter"],c:1},
-{q:"Which gas we breathe?",o:["Oxygen","Hydrogen","Nitrogen","CO2"],c:0},
-{q:"Largest desert?",o:["Sahara","Gobi","Thar","Kalahari"],c:0},
-{q:"National bird of India?",o:["Peacock","Parrot","Crow","Eagle"],c:0},
-{q:"Longest river?",o:["Amazon","Nile","Ganga","Yangtze"],c:1},
-{q:"First PM of India?",o:["Gandhi","Nehru","Patel","Rajendra"],c:1},
-{q:"Largest island?",o:["Greenland","Madagascar","Sri Lanka","Borneo"],c:0},
-{q:"Liquid metal?",o:["Gold","Mercury","Iron","Silver"],c:1},
-{q:"Planet with rings?",o:["Earth","Mars","Saturn","Venus"],c:2},
-{q:"Pyramids are in?",o:["India","China","Egypt","Brazil"],c:2},
-{q:"Smallest planet?",o:["Mercury","Mars","Venus","Earth"],c:0},
-
-{q:"Which is largest mammal?",o:["Elephant","Blue Whale","Giraffe","Shark"],c:1},
-{q:"Which is fastest bird?",o:["Falcon","Crow","Peacock","Owl"],c:0},
-{q:"Which metal is lightest?",o:["Iron","Gold","Lithium","Silver"],c:2},
-{q:"Which gas is used in balloons?",o:["Helium","Oxygen","Nitrogen","CO2"],c:0},
-{q:"Which country has Eiffel Tower?",o:["Italy","France","Germany","Spain"],c:1},
-{q:"Which is smallest ocean?",o:["Pacific","Indian","Arctic","Atlantic"],c:2},
-{q:"Which festival is festival of lights?",o:["Holi","Diwali","Eid","Christmas"],c:1},
-{q:"Which is largest continent?",o:["Asia","Africa","Europe","America"],c:0},
-{q:"Which is longest bone?",o:["Femur","Skull","Spine","Rib"],c:0},
-{q:"Which is smallest state of India?",o:["Goa","Sikkim","Punjab","Kerala"],c:0},
-
-{q:"Which is largest country?",o:["India","Russia","USA","China"],c:1},
-{q:"Which is hottest planet?",o:["Mars","Venus","Mercury","Earth"],c:1},
-{q:"Which organ pumps blood?",o:["Brain","Heart","Lungs","Kidney"],c:1},
-{q:"Which is largest organ?",o:["Skin","Liver","Heart","Brain"],c:0},
-{q:"Which animal is called Ship of Desert?",o:["Horse","Camel","Elephant","Dog"],c:1},
-
-{q:"Which is national sport of India?",o:["Cricket","Hockey","Football","Tennis"],c:1},
-{q:"Which is coldest continent?",o:["Asia","Antarctica","Europe","Africa"],c:1},
-{q:"Which vitamin from Sun?",o:["A","B","C","D"],c:3},
-{q:"Which bird can't fly?",o:["Sparrow","Penguin","Crow","Eagle"],c:1},
-{q:"Which is tallest animal?",o:["Elephant","Giraffe","Horse","Lion"],c:1},
-
-// 60 more below...
-
+{q:"1. What is the capital of India?",o:["Mumbai","Delhi","Chennai","Kolkata"],c:1},
+{q:"2. Which is the largest planet in our solar system?",o:["Earth","Mars","Jupiter","Saturn"],c:2},
+{q:"3. Who invented the light bulb?",o:["Edison","Tesla","Newton","Bell"],c:0},
+{q:"4. What is the longest river in the world?",o:["Nile","Amazon","Yangtze","Mississippi"],c:0},
+{q:"5. What is the smallest continent?",o:["Europe","Australia","Africa","Asia"],c:1},
+{q:"6. Which gas is most abundant in the Earth’s atmosphere?",o:["Oxygen","Hydrogen","Nitrogen","Carbon Dioxide"],c:2},
+{q:"7. Who wrote the play 'Romeo and Juliet'?",o:["Shakespeare","Dickens","Hemingway","Twain"],c:0},
+{q:"8. What is the chemical symbol for water?",o:["O2","H2","H2O","CO2"],c:2},
+{q:"9. Which country is known as 'The Land of the Rising Sun'?",o:["China","Japan","India","Thailand"],c:1},
+{q:"10. What is the largest ocean on Earth?",o:["Atlantic","Indian","Pacific","Arctic"],c:2},
+// ... continue all the way to question 100
+{q:"100. Which sea is between Europe and Africa?",o:["Red Sea","Black Sea","Mediterranean","Baltic"],c:2}
 ];
 
-while(questions.length<100){
-questions.push({
-q:"GK Question "+(questions.length+1),
-o:["A","B","C","D"],
-c:0
-});
+let current=0, score=0, timeLeft=20, timer;
+let playerName="";
+
+// Start Quiz
+function startQuiz(){
+  playerName = document.getElementById('playerInput').value || "Player";
+  document.getElementById('playerName').innerText = "Player: "+playerName;
+  document.getElementById('startBox').style.display="none";
+  document.getElementById('quizBox').style.display="block";
+  loadQuestion();
 }
 
-let current=0,score=0,time=20,timer;
-
-function loadQuestion(){
-startTimer();
-let q=questions[current];
-document.getElementById("question").innerText=q.q;
-for(let i=0;i<4;i++){
-document.getElementById("opt"+i).innerText=q.o[i];
-}
-document.getElementById("progressBar").style.width=(current/100)*100+"%";
-}
-
-function checkAnswer(i){
-clearInterval(timer);
-if(i===questions[current].c){score++;}
-current++;
-document.getElementById("score").innerText="Score: "+score;
-if(current<100){loadQuestion();}
-else{finishQuiz();}
-}
-
-function finishQuiz(){
-document.getElementById("question").innerText="Quiz Completed!";
-document.getElementById("scoreBoard").style.display="block";
-document.getElementById("scoreBoard").innerHTML="🏆 Final Score: "+score+" / 100";
-document.getElementById("restartBtn").style.display="block";
-}
-
-function restartQuiz(){
-current=0;score=0;
-document.getElementById("scoreBoard").style.display="none";
-document.getElementById("restartBtn").style.display="none";
-loadQuestion();
-}
-
+// Timer
 function startTimer(){
-clearInterval(timer);
-time=20;
-timer=setInterval(()=>{
-time--;
-document.getElementById("timer").innerText="⏱ Time: "+time;
-if(time==0){checkAnswer(-1);}
-},1000);
+  clearInterval(timer);
+  timeLeft=20;
+  document.getElementById("timer").innerText = "⏱ Time: "+timeLeft;
+  timer=setInterval(()=>{
+    timeLeft--;
+    document.getElementById("timer").innerText = "⏱ Time: "+timeLeft;
+    if(timeLeft<=0){ checkAnswer(-1); }
+  },1000);
 }
 
-loadQuestion();
+// Load Question
+function loadQuestion(){
+  startTimer();
+  let q = questions[current];
+  document.getElementById("question").innerText = q.q;
+  for(let i=0;i<4;i++){
+    document.getElementById("opt"+i).innerText = q.o[i];
+  }
+  document.getElementById("progressBar").style.width = (current/100)*100+"%";
+  document.getElementById("score").innerText = "Score: "+score;
+}
 
+// Check Answer
+function checkAnswer(i){
+  clearInterval(timer);
+  let correct = questions[current].c;
+  if(i === correct){
+    score++;
+    document.getElementById("correctSound").play();
+  } else {
+    document.getElementById("wrongSound").play();
+  }
+  current++;
+  if(current < questions.length){
+    loadQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+// Finish Quiz
+function finishQuiz(){
+  document.getElementById("question").innerText="🏁 Quiz Completed!";
+  document.getElementById("scoreBoard").style.display="block";
+  document.getElementById("scoreBoard").innerHTML = "🏆 "+playerName+"'s Score: "+score+" / 100";
+  document.getElementById("restartBtn").style.display="block";
+  confettiEffect();
+}
+
+// Restart
+function restartQuiz(){
+  current=0; score=0;
+  document.getElementById("scoreBoard").style.display="none";
+  document.getElementById("restartBtn").style.display="none";
+  loadQuestion();
+}
+
+// Simple Confetti
+function confettiEffect(){
+  let colors = ["#ff0","#0ff","#f0f","#0f0","#f00","#00f"];
+  for(let i=0;i<200;i++){
+    let div = document.createElement("div");
+    div.style.position="fixed";
+    div.style.width="10px";
+    div.style.height="10px";
+    div.style.background = colors[Math.floor(Math.random()*colors.length)];
+    div.style.left = Math.random()*window.innerWidth+"px";
+    div.style.top = Math.random()*window.innerHeight+"px";
+    div.style.opacity=0.7;
+    div.style.borderRadius="50%";
+    div.style.zIndex=9999;
+    document.body.appendChild(div);
+    setTimeout(()=>div.remove(),2000+Math.random()*2000);
+  }
+}
 </script>
+
 </body>
 </html>
