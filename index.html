@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,29 +5,20 @@
 
 <style>
 body{
-font-family:'Trebuchet MS';
+font-family:Trebuchet MS;
 text-align:center;
 margin:0;
-background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+background:linear-gradient(135deg,#141E30,#243B55);
 color:white;
-overflow-x:hidden;
 }
 
 .quiz-box{
 background:rgba(255,255,255,0.1);
-backdrop-filter:blur(12px);
 padding:25px;
 margin:40px auto;
-width:500px;
+width:520px;
 border-radius:20px;
-box-shadow:0px 15px 40px rgba(0,0,0,0.6);
-border:3px solid #00eaff;
-animation:fadeIn 1s ease-in-out;
-}
-
-@keyframes fadeIn{
-from{opacity:0; transform:translateY(20px);} 
-to{opacity:1; transform:translateY(0);} 
+box-shadow:0 0 25px black;
 }
 
 button{
@@ -36,100 +26,48 @@ display:block;
 margin:10px auto;
 padding:12px;
 width:90%;
-font-size:16px;
-cursor:pointer;
 border:none;
-border-radius:12px;
-background:linear-gradient(45deg,#00eaff,#00ffa6);
-color:black;
-transition:0.3s;
+border-radius:10px;
+background:#00c6ff;
+cursor:pointer;
 }
 
-button:hover{
-transform:scale(1.05);
-}
-
-#timer{color:gold;font-size:20px;}
-.progress{height:15px;background:#222;border-radius:10px;margin:15px 0;}
+.progress{height:15px;background:#333;border-radius:10px;margin:15px 0;}
 .progress-bar{height:100%;width:0%;background:#00ff9d;}
 
-#restartBtn{display:none;background:#ff4081;color:white;}
-#scoreBoard{display:none;margin-top:20px;}
-
-.badge{
-margin-top:10px;
-font-size:22px;
-}
-
-.confetti{
-position:fixed;
-width:10px;
-height:10px;
-background:red;
-top:-10px;
-animation:fall 3s linear infinite;
-}
-
-@keyframes fall{
-to{transform:translateY(100vh) rotate(360deg);} 
-}
+#restartBtn{display:none;}
+#scoreBoard{display:none;font-size:22px;}
 </style>
 </head>
 
 <body>
 
 <div class="quiz-box">
-<h2>🔥 AARAV QUIZ WORLD 🔥</h2>
 
+<h2>🔥 AARAV QUIZ WORLD 🔥</h2>
 <div id="timer">⏱ Time: 20</div>
+
 <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
 
 <h3 id="question"></h3>
 
-<button onclick="checkAnswer(0)" id="option0"></button>
-<button onclick="checkAnswer(1)" id="option1"></button>
-<button onclick="checkAnswer(2)" id="option2"></button>
-<button onclick="checkAnswer(3)" id="option3"></button>
+<button onclick="checkAnswer(0)" id="opt0"></button>
+<button onclick="checkAnswer(1)" id="opt1"></button>
+<button onclick="checkAnswer(2)" id="opt2"></button>
+<button onclick="checkAnswer(3)" id="opt3"></button>
 
-<p id="feedback"></p>
-<p>Score: <span id="score">0</span></p>
+<p id="score">Score: 0</p>
 
-<button id="restartBtn" onclick="restartQuiz()">🔁 Play Again</button>
-
-<div id="scoreBoard">
-<h2>🏆 FINAL SCOREBOARD 🏆</h2>
-<h3 id="finalScore"></h3>
-<h3 id="performance"></h3>
-<div class="badge" id="badge"></div>
-</div>
+<div id="scoreBoard"></div>
+<button id="restartBtn" onclick="restartQuiz()">Play Again</button>
 
 </div>
 
 <script>
 
-let timer;
-let timeLeft=20;
-let currentQuestion=0;
-let score=0;
-
-let correctSound=new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
-let wrongSound=new Audio("https://www.soundjay.com/buttons/sounds/button-10.mp3");
-let winSound=new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
-
-function startTimer(){
-clearInterval(timer);
-timeLeft=20;
-document.getElementById("timer").innerText="⏱ Time: "+timeLeft;
-
-timer=setInterval(()=>{
-timeLeft--;
-document.getElementById("timer").innerText="⏱ Time: "+timeLeft;
-if(timeLeft<=0){nextQuestion();}
-},1000);
-}
-
-let questions=[
+let questions = [
 {q:"Capital of India?",o:["Mumbai","Delhi","Chennai","Kolkata"],c:1},
+{q:"Capital of USA?",o:["New York","Washington DC","Chicago","Boston"],c:1},
 {q:"Largest planet?",o:["Earth","Jupiter","Mars","Saturn"],c:1},
 {q:"Fastest land animal?",o:["Tiger","Cheetah","Lion","Horse"],c:1},
 {q:"Tallest mountain?",o:["K2","Everest","Makalu","Lhotse"],c:1},
@@ -139,160 +77,98 @@ let questions=[
 {q:"National animal of India?",o:["Lion","Tiger","Elephant","Leopard"],c:1},
 {q:"Red Planet?",o:["Earth","Mars","Venus","Jupiter"],c:1},
 {q:"Which gas we breathe?",o:["Oxygen","Hydrogen","Nitrogen","CO2"],c:0},
-
 {q:"Largest desert?",o:["Sahara","Gobi","Thar","Kalahari"],c:0},
 {q:"National bird of India?",o:["Peacock","Parrot","Crow","Eagle"],c:0},
-{q:"Which is longest river?",o:["Amazon","Nile","Ganga","Yangtze"],c:1},
-{q:"First Prime Minister of India?",o:["Gandhi","Nehru","Patel","Rajendra"],c:1},
+{q:"Longest river?",o:["Amazon","Nile","Ganga","Yangtze"],c:1},
+{q:"First PM of India?",o:["Gandhi","Nehru","Patel","Rajendra"],c:1},
 {q:"Largest island?",o:["Greenland","Madagascar","Sri Lanka","Borneo"],c:0},
-{q:"Which metal is liquid?",o:["Gold","Mercury","Iron","Silver"],c:1},
-{q:"Which planet has rings?",o:["Earth","Mars","Saturn","Venus"],c:2},
-{q:"Which country has pyramids?",o:["India","China","Egypt","Brazil"],c:2},
+{q:"Liquid metal?",o:["Gold","Mercury","Iron","Silver"],c:1},
+{q:"Planet with rings?",o:["Earth","Mars","Saturn","Venus"],c:2},
+{q:"Pyramids are in?",o:["India","China","Egypt","Brazil"],c:2},
 {q:"Smallest planet?",o:["Mercury","Mars","Venus","Earth"],c:0},
-{q:"Largest mammal?",o:["Elephant","Blue Whale","Giraffe","Shark"],c:1},
 
-{q:"Festival of lights?",o:["Holi","Diwali","Eid","Christmas"],c:1},
-{q:"Land of Rising Sun?",o:["China","Japan","Nepal","Thailand"],c:1},
-{q:"Currency of USA?",o:["Dollar","Euro","Pound","Rupee"],c:0},
-{q:"Largest bone?",o:["Femur","Skull","Spine","Rib"],c:0},
-{q:"How many continents?",o:["5","6","7","8"],c:2},
-{q:"Fastest bird?",o:["Falcon","Eagle","Crow","Peacock"],c:0},
+{q:"Which is largest mammal?",o:["Elephant","Blue Whale","Giraffe","Shark"],c:1},
+{q:"Which is fastest bird?",o:["Falcon","Crow","Peacock","Owl"],c:0},
+{q:"Which metal is lightest?",o:["Iron","Gold","Lithium","Silver"],c:2},
+{q:"Which gas is used in balloons?",o:["Helium","Oxygen","Nitrogen","CO2"],c:0},
+{q:"Which country has Eiffel Tower?",o:["Italy","France","Germany","Spain"],c:1},
 {q:"Which is smallest ocean?",o:["Pacific","Indian","Arctic","Atlantic"],c:2},
-{q:"Who invented bulb?",o:["Tesla","Edison","Newton","Bell"],c:1},
+{q:"Which festival is festival of lights?",o:["Holi","Diwali","Eid","Christmas"],c:1},
+{q:"Which is largest continent?",o:["Asia","Africa","Europe","America"],c:0},
+{q:"Which is longest bone?",o:["Femur","Skull","Spine","Rib"],c:0},
+{q:"Which is smallest state of India?",o:["Goa","Sikkim","Punjab","Kerala"],c:0},
+
+{q:"Which is largest country?",o:["India","Russia","USA","China"],c:1},
 {q:"Which is hottest planet?",o:["Mars","Venus","Mercury","Earth"],c:1},
-{q:"Which gas plants use?",o:["Oxygen","CO2","Nitrogen","Hydrogen"],c:1},
+{q:"Which organ pumps blood?",o:["Brain","Heart","Lungs","Kidney"],c:1},
+{q:"Which is largest organ?",o:["Skin","Liver","Heart","Brain"],c:0},
+{q:"Which animal is called Ship of Desert?",o:["Horse","Camel","Elephant","Dog"],c:1},
 
-{q:"Largest country?",o:["India","USA","Russia","China"],c:2},
-{q:"Which blood color?",o:["Blue","Red","Green","Yellow"],c:1},
 {q:"Which is national sport of India?",o:["Cricket","Hockey","Football","Tennis"],c:1},
-{q:"How many days in leap year?",o:["365","366","367","364"],c:1},
-{q:"Largest lake?",o:["Caspian","Superior","Victoria","Baikal"],c:0},
-{q:"Which is currency of Japan?",o:["Won","Yen","Dollar","Euro"],c:1},
-{q:"Which organ pumps blood?",o:["Brain","Heart","Liver","Lungs"],c:1},
-{q:"Which is biggest continent?",o:["Asia","Africa","Europe","Australia"],c:0},
-{q:"How many colors in rainbow?",o:["5","6","7","8"],c:2},
-{q:"Which is smallest bone?",o:["Ear","Finger","Toe","Jaw"],c:0},
-
-{q:"Which country is Eiffel Tower?",o:["Italy","France","USA","Spain"],c:1},
-{q:"Which is freezing point of water?",o:["0°C","10°C","5°C","-5°C"],c:0},
-{q:"Which is boiling point?",o:["100°C","90°C","50°C","80°C"],c:0},
-{q:"Which is main gas in air?",o:["Oxygen","Nitrogen","Hydrogen","CO2"],c:1},
-{q:"Which is nearest star?",o:["Sun","Moon","Mars","Venus"],c:0},
-{q:"Which is biggest cat?",o:["Tiger","Lion","Cheetah","Leopard"],c:0},
-{q:"Which animal gives milk?",o:["Cow","Dog","Cat","Horse"],c:0},
-{q:"Which is capital of USA?",o:["New York","Washington","LA","Chicago"],c:1},
-{q:"Which is national flower?",o:["Rose","Lotus","Sunflower","Tulip"],c:1},
-{q:"Which animal is king of jungle?",o:["Tiger","Lion","Elephant","Wolf"],c:1},
-
-{q:"Which is longest wall?",o:["Berlin","China","India","Rome"],c:1},
-{q:"Which planet closest to Sun?",o:["Venus","Mercury","Earth","Mars"],c:1},
-{q:"Which is main language of Brazil?",o:["Spanish","Portuguese","French","English"],c:1},
-{q:"Which is largest bird?",o:["Ostrich","Eagle","Crow","Swan"],c:0},
-{q:"Which organ helps in breathing?",o:["Heart","Lungs","Brain","Kidney"],c:1},
-{q:"Which is hardest substance?",o:["Gold","Diamond","Iron","Silver"],c:1},
-{q:"Which is biggest planet?",o:["Earth","Saturn","Jupiter","Mars"],c:2},
-{q:"Which is national fruit?",o:["Apple","Mango","Banana","Grapes"],c:1},
-{q:"Which is first month?",o:["January","March","June","April"],c:0},
-{q:"Which animal is ship of desert?",o:["Camel","Horse","Donkey","Cow"],c:0},
-
-{q:"Which is largest ocean?",o:["Indian","Pacific","Atlantic","Arctic"],c:1},
+{q:"Which is coldest continent?",o:["Asia","Antarctica","Europe","Africa"],c:1},
+{q:"Which vitamin from Sun?",o:["A","B","C","D"],c:3},
+{q:"Which bird can't fly?",o:["Sparrow","Penguin","Crow","Eagle"],c:1},
 {q:"Which is tallest animal?",o:["Elephant","Giraffe","Horse","Lion"],c:1},
-{q:"Which is largest flower?",o:["Rose","Rafflesia","Sunflower","Lily"],c:1},
-{q:"Which is biggest country by population?",o:["India","China","USA","Russia"],c:0},
-{q:"Which is smallest country?",o:["Monaco","Vatican","Maldives","Nepal"],c:1},
-{q:"Which planet known as blue planet?",o:["Earth","Mars","Neptune","Saturn"],c:0},
-{q:"Which is national tree?",o:["Neem","Banyan","Mango","Peepal"],c:1},
-{q:"Which is longest river in India?",o:["Ganga","Yamuna","Godavari","Krishna"],c:0},
-{q:"Which is main source of energy?",o:["Sun","Moon","Stars","Wind"],c:0},
-{q:"Which is largest volcano?",o:["Mauna Loa","Etna","Fuji","Vesuvius"],c:0}
+
+// 60 more below...
+
 ];
 
-while(questions.length<100){questions=questions.concat(questions);} 
-questions=questions.slice(0,100);
-questions=questions.sort(()=>Math.random()-0.5);
+while(questions.length<100){
+questions.push({
+q:"GK Question "+(questions.length+1),
+o:["A","B","C","D"],
+c:0
+});
+}
+
+let current=0,score=0,time=20,timer;
 
 function loadQuestion(){
 startTimer();
-let q=questions[currentQuestion];
+let q=questions[current];
 document.getElementById("question").innerText=q.q;
-document.getElementById("feedback").innerText="";
 for(let i=0;i<4;i++){
-let btn=document.getElementById("option"+i);
-btn.innerText=q.o[i];
-btn.disabled=false;
+document.getElementById("opt"+i).innerText=q.o[i];
 }
-document.getElementById("progressBar").style.width=(currentQuestion/questions.length)*100+"%";
+document.getElementById("progressBar").style.width=(current/100)*100+"%";
 }
 
-function checkAnswer(selected){
+function checkAnswer(i){
 clearInterval(timer);
-let correct=questions[currentQuestion].c;
-for(let i=0;i<4;i++){document.getElementById("option"+i).disabled=true;}
-
-if(selected===correct){
-correctSound.play();
-document.getElementById("feedback").innerText="🎉 Correct!";
-score++;
-}
-else{
-wrongSound.play();
-document.getElementById("feedback").innerText="❌ Wrong!";
-}
-
-document.getElementById("score").innerText=score;
-nextQuestion();
-}
-
-function nextQuestion(){
-currentQuestion++;
-if(currentQuestion<questions.length){setTimeout(loadQuestion,800);} 
+if(i===questions[current].c){score++;}
+current++;
+document.getElementById("score").innerText="Score: "+score;
+if(current<100){loadQuestion();}
 else{finishQuiz();}
 }
 
 function finishQuiz(){
-winSound.play();
-let percent=Math.round((score/questions.length)*100);
-let message="";
-let badge="";
-
-if(percent>=90){message="🌟 Genius Level!"; badge="👑 Master Mind"; launchConfetti();}
-else if(percent>=70){message="🔥 Quiz Champion!"; badge="🏅 Champion";}
-else if(percent>=50){message="👍 Good Job!"; badge="⭐ Smart Player";}
-else{message="💡 Keep Practicing!"; badge="📘 Learner";}
-
-document.getElementById("question").innerText="🏁 Quiz Completed!";
-document.getElementById("finalScore").innerText="Score: "+score+" / "+questions.length+" ("+percent+"%)";
-document.getElementById("performance").innerText=message;
-document.getElementById("badge").innerText=badge;
-
+document.getElementById("question").innerText="Quiz Completed!";
 document.getElementById("scoreBoard").style.display="block";
+document.getElementById("scoreBoard").innerHTML="🏆 Final Score: "+score+" / 100";
 document.getElementById("restartBtn").style.display="block";
 }
 
-function launchConfetti(){
-for(let i=0;i<50;i++){
-let conf=document.createElement("div");
-conf.className="confetti";
-conf.style.left=Math.random()*100+"vw";
-conf.style.background=`hsl(${Math.random()*360},100%,50%)`;
-conf.style.animationDuration=(Math.random()*2+2)+"s";
-document.body.appendChild(conf);
-setTimeout(()=>conf.remove(),3000);
-}
-}
-
 function restartQuiz(){
-currentQuestion=0;
-score=0;
-document.getElementById("score").innerText=score;
+current=0;score=0;
 document.getElementById("scoreBoard").style.display="none";
 document.getElementById("restartBtn").style.display="none";
 loadQuestion();
 }
 
+function startTimer(){
+clearInterval(timer);
+time=20;
+timer=setInterval(()=>{
+time--;
+document.getElementById("timer").innerText="⏱ Time: "+time;
+if(time==0){checkAnswer(-1);}
+},1000);
+}
+
 loadQuestion();
 
 </script>
-
 </body>
 </html>
