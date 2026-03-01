@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AARAV QUIZ WORLD 🌍</title>
+    <style>
+        body {
+            font-family: 'Trebuchet MS', sans-serif;
+            text-align: center;
+            margin: 0;
+            background: linear-gradient(135deg,#141E30,#243B55);
+            color:white;
+        }
+
+        /* IMAGE BORDERS */
+        .left-border, .right-border {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .left-border { left: 0; }
+        .right-border { right: 0; }
+
+        .left-border img, .right-border img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0px 0px 10px cyan;
+        }
+
+        .quiz-box {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            margin: 40px auto;
+            width: 480px;
+            border-radius: 20px;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid #00c6ff;
+        }
+
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 12px;
+            width: 85%;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            transition: 0.3s;
+            background: #00c6ff;
+            color:black;
+        }
+
+        button:hover { transform: scale(1.05); }
+
+        #timer { font-size:18px;color:#ffd700; }
+
+        .progress { height:15px;background:#333;border-radius:10px;margin:15px 0; }
+        .progress-bar { height:100%;width:0%;background:#00ff9d; }
+
+        #restartBtn { display:none;background:#ff4081;color:white; }
+    </style>
+</head>
+<body>
+
+<div class="left-border">
+<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+<img src="https://cdn-icons-png.flaticon.com/512/201/201623.png">
+<img src="https://cdn-icons-png.flaticon.com/512/3212/3212608.png">
+<img src="https://cdn-icons-png.flaticon.com/512/4149/4149670.png">
+</div>
+
+<div class="right-border">
+<img src="https://cdn-icons-png.flaticon.com/512/921/921490.png">
+<img src="https://cdn-icons-png.flaticon.com/512/1995/1995539.png">
+<img src="https://cdn-icons-png.flaticon.com/512/3468/3468377.png">
+<img src="https://cdn-icons-png.flaticon.com/512/2909/2909760.png">
+</div>
+
+<div class="quiz-box">
+<h2>🔥 AARAV QUIZ WORLD 🔥</h2>
+<div id="timer">⏱ Time: 20</div>
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+<h3 id="question"></h3>
+<button onclick="checkAnswer(0)" id="option0"></button>
+<button onclick="checkAnswer(1)" id="option1"></button>
+<button onclick="checkAnswer(2)" id="option2"></button>
+<button onclick="checkAnswer(3)" id="option3"></button>
+<p id="feedback"></p>
+<p>Score: <span id="score">0</span></p>
+<button id="restartBtn" onclick="restartQuiz()">🔁 Play Again</button>
+</div>
+
+<script>
+let timer; let timeLeft=20;
+function startTimer(){ clearInterval(timer); timeLeft=20; document.getElementById("timer").innerText="⏱ Time: "+timeLeft;
+ timer=setInterval(()=>{ timeLeft--; document.getElementById("timer").innerText="⏱ Time: "+timeLeft;
+ if(timeLeft<=0){ nextQuestion(); } },1000); }
+
+let questions=[
+{q:"What is the capital of India?",o:["Mumbai","Delhi","Kolkata","Chennai"],c:1},
+{q:"Which is the largest desert?",o:["Sahara","Thar","Gobi","Kalahari"],c:0},
+{q:"Which planet is called Red Planet?",o:["Earth","Mars","Venus","Jupiter"],c:1},
+{q:"Who wrote National Anthem of India?",o:["Tagore","Gandhi","Nehru","Ambedkar"],c:0},
+{q:"Which is the tallest mountain?",o:["Everest","K2","Kanchenjunga","Makalu"],c:0},
+{q:"How many continents are there?",o:["5","6","7","8"],c:2},
+{q:"Which is the fastest bird?",o:["Eagle","Falcon","Crow","Peacock"],c:1},
+{q:"Which gas do we breathe?",o:["Oxygen","Nitrogen","Hydrogen","CO2"],c:0},
+{q:"Who was first President of India?",o:["Rajendra Prasad","Nehru","Patel","Kalam"],c:0},
+{q:"Which is smallest ocean?",o:["Pacific","Indian","Arctic","Atlantic"],c:2},
+{q:"Which country is famous for pyramids?",o:["India","China","Egypt","Brazil"],c:2},
+{q:"Which is largest animal?",o:["Elephant","Blue Whale","Giraffe","Shark"],c:1},
+{q:"Which festival is called festival of lights?",o:["Holi","Diwali","Eid","Christmas"],c:1},
+{q:"Which metal is liquid?",o:["Gold","Mercury","Iron","Silver"],c:1},
+{q:"Which is the longest river?",o:["Ganga","Nile","Amazon","Yangtze"],c:1},
+{q:"Which country is known as Land of Rising Sun?",o:["China","Japan","Thailand","Nepal"],c:1},
+{q:"Which is the largest island?",o:["Greenland","Sri Lanka","Madagascar","Borneo"],c:0},
+{q:"Which is the smallest planet?",o:["Mercury","Mars","Venus","Earth"],c:0},
+{q:"Which animal is known as Ship of Desert?",o:["Camel","Horse","Elephant","Dog"],c:0},
+{q:"Which planet has rings?",o:["Earth","Mars","Saturn","Venus"],c:2}
+];
+
+let base=[...questions];
+while(questions.length<100){ questions=questions.concat(base); }
+questions=questions.slice(0,100);
+
+let currentQuestion=0; let score=0;
+
+function loadQuestion(){ startTimer(); let q=questions[currentQuestion];
+ document.getElementById("question").innerText=q.q;
+ document.getElementById("feedback").innerText="";
+ for(let i=0;i<4;i++){ let btn=document.getElementById("option"+i);
+ btn.innerText=q.o[i]; btn.disabled=false; btn.style.background="#00c6ff"; }
+ document.getElementById("progressBar").style.width=(currentQuestion/questions.length)*100+"%";
+}
+
+function checkAnswer(selected){ clearInterval(timer);
+ let correct=questions[currentQuestion].c;
+ for(let i=0;i<4;i++) document.getElementById("option"+i).disabled=true;
+ if(selected===correct){ document.getElementById("feedback").innerText="🎉 Correct!"; score++; }
+ else{ document.getElementById("feedback").innerText="❌ Wrong!"; }
+ document.getElementById("score").innerText=score; nextQuestion(); }
+
+function nextQuestion(){ currentQuestion++;
+ if(currentQuestion<questions.length){ setTimeout(loadQuestion,800); }
+ else{ finishQuiz(); } }
+
+function finishQuiz(){ document.getElementById("question").innerText="🏁 Finished! Score: "+score+"/"+questions.length;
+ document.getElementById("restartBtn").style.display="block"; }
+
+function restartQuiz(){ currentQuestion=0; score=0;
+ document.getElementById("score").innerText=score;
+ document.getElementById("restartBtn").style.display="none";
+ loadQuestion(); }
+
+loadQuestion();
+</script>
+</body>
+</html>
