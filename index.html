@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AARAV QUIZ WORLD 🌍</title>
+  <title>AARAV QUIZ WORLD 🌍 - 30 Questions</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: linear-gradient(135deg, #141E30, #243B55);
-      color: white;
-      margin: 0;
-      padding: 0;
+      background: linear-gradient(135deg,#141E30,#243B55);
+      color:white;
+      margin:0;
+      padding:0;
     }
     .quiz-box {
       background: rgba(255,255,255,0.1);
@@ -31,172 +31,100 @@
       cursor: pointer;
       font-size: 16px;
     }
-    button:hover {
-      background: #00a3cc;
-    }
-    .progress {
-      height: 15px;
-      background: #333;
-      border-radius: 10px;
-      margin: 15px 0;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #00ff9d;
-    }
-    #restartBtn { display: none; background: #ff4081; color: white; }
-    #scoreBoard { display: none; font-size: 22px; margin-top: 15px; }
+    button:hover { background:#00a3cc; }
+    .progress { height:15px; background:#333; border-radius:10px; margin:15px 0; }
+    .progress-bar { height:100%; width:0%; background:#00ff9d; }
+    #restartBtn { display:none; background:#ff4081; color:white; }
+    #scoreBoard { display:none; font-size:22px; margin-top:15px; }
+    #playerInput { margin:20px auto; padding:10px; font-size:16px; width:300px; border-radius:10px; border:none; }
   </style>
 </head>
-
 <body>
 
-<div class="quiz-box">
+<div class="quiz-box" id="startBox">
   <h2>🔥 AARAV QUIZ WORLD 🔥</h2>
+  <input type="text" placeholder="Enter your name" id="playerInput">
+  <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div class="quiz-box" id="quizBox" style="display:none;">
+  <h2 id="playerName"></h2>
   <div id="timer">⏱ Time: 20</div>
   <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
-
   <h3 id="question">Question text</h3>
-
   <button onclick="checkAnswer(0)" id="opt0">Option 1</button>
   <button onclick="checkAnswer(1)" id="opt1">Option 2</button>
   <button onclick="checkAnswer(2)" id="opt2">Option 3</button>
   <button onclick="checkAnswer(3)" id="opt3">Option 4</button>
-
   <p id="score">Score: 0</p>
-
   <div id="scoreBoard"></div>
   <button id="restartBtn" onclick="restartQuiz()">🔁 Play Again</button>
 </div>
 
+<!-- Sound Effects -->
+<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
 <script>
+// 30 GK Questions
 let questions = [
 {q:"1. What is the capital of India?",o:["Mumbai","Delhi","Chennai","Kolkata"],c:1},
-{q:"2. Which is the largest planet in our solar system?",o:["Earth","Mars","Jupiter","Saturn"],c:2},
-{q:"3. Who invented the light bulb?",o:["Edison","Tesla","Newton","Bell"],c:0},
-{q:"4. What is the longest river in the world?",o:["Nile","Amazon","Yangtze","Mississippi"],c:0},
-{q:"5. What is the smallest continent?",o:["Europe","Australia","Africa","Asia"],c:1},
-{q:"6. Which gas is most abundant in the Earth’s atmosphere?",o:["Oxygen","Hydrogen","Nitrogen","Carbon Dioxide"],c:2},
-{q:"7. Who wrote the play 'Romeo and Juliet'?",o:["Shakespeare","Dickens","Hemingway","Twain"],c:0},
-{q:"8. What is the chemical symbol for water?",o:["O2","H2","H2O","CO2"],c:2},
-{q:"9. Which country is known as 'The Land of the Rising Sun'?",o:["China","Japan","India","Thailand"],c:1},
-{q:"10. What is the largest ocean on Earth?",o:["Atlantic","Indian","Pacific","Arctic"],c:2},
-
-{q:"11. Which is the highest mountain in the world?",o:["K2","Makalu","Everest","Lhotse"],c:2},
-{q:"12. What is the boiling point of water?",o:["50°C","100°C","150°C","200°C"],c:1},
-{q:"13. Who discovered penicillin?",o:["Curie","Fleming","Darwin","Pasteur"],c:1},
-{q:"14. Which country gifted the Statue of Liberty to the USA?",o:["UK","Germany","France","Spain"],c:2},
-{q:"15. What is the largest mammal?",o:["Elephant","Blue Whale","Giraffe","Rhino"],c:1},
-{q:"16. How many continents are there?",o:["5","6","7","8"],c:2},
-{q:"17. Which instrument measures temperature?",o:["Barometer","Thermometer","Odometer","Altimeter"],c:1},
-{q:"18. What is the hardest natural substance?",o:["Iron","Gold","Diamond","Silver"],c:2},
-{q:"19. Who was the first President of the USA?",o:["Lincoln","Washington","Jefferson","Adams"],c:1},
-{q:"20. The Great Wall of China is visible from?",o:["Moon","Space","Earth","Mars"],c:2},
-
-{q:"21. What is the smallest prime number?",o:["0","1","2","3"],c:2},
-{q:"22. What is the capital of Japan?",o:["Seoul","Tokyo","Beijing","Bangkok"],c:1},
-{q:"23. Who wrote '1984'?",o:["Orwell","Huxley","Bradbury","Lewis"],c:0},
-{q:"24. Which planet is known as Earth’s twin?",o:["Mars","Venus","Mercury","Neptune"],c:1},
-{q:"25. What do bees produce?",o:["Milk","Honey","Wax","Bread"],c:1},
-{q:"26. Which animal is known as the King of the Jungle?",o:["Lion","Tiger","Leopard","Elephant"],c:0},
-{q:"27. What part of the plant conducts photosynthesis?",o:["Root","Stem","Leaf","Flower"],c:2},
-{q:"28. Who painted the Mona Lisa?",o:["Van Gogh","Da Vinci","Picasso","Rembrandt"],c:1},
-{q:"29. What is the capital of Australia?",o:["Sydney","Canberra","Melbourne","Perth"],c:1},
-{q:"30. Which language has the most native speakers?",o:["Spanish","English","Mandarin","Hindi"],c:2},
-
-{q:"31. What is the powerhouse of the cell?",o:["Nucleus","Ribosome","Mitochondria","Chloroplast"],c:2},
-{q:"32. Who invented the telephone?",o:["Newton","Bell","Edison","Tesla"],c:1},
-{q:"33. Which country hosted the 2016 Olympics?",o:["China","UK","Brazil","Japan"],c:2},
-{q:"34. What is H2SO4?",o:["Hydrochloric acid","Nitric acid","Sulfuric acid","Acetic acid"],c:2},
-{q:"35. What is the largest desert in the world?",o:["Gobi","Sahara","Kalahari","Thar"],c:1},
-{q:"36. Who discovered electricity?",o:["Tesla","Faraday","Edison","Volta"],c:1},
-{q:"37. Which element has the chemical symbol 'Au'?",o:["Silver","Gold","Argon","Iron"],c:1},
-{q:"38. Who wrote the Mahabharata?",o:["Valmiki","Vyasa","Kalidasa","Tulsidas"],c:1},
-{q:"39. Which planet is closest to the Sun?",o:["Venus","Mercury","Mars","Earth"],c:1},
-{q:"40. What is the largest frog?",o:["Goliath Frog","Bullfrog","Tree Frog","Poison Dart Frog"],c:0},
-
-{q:"41. Which ocean is the deepest?",o:["Atlantic","Indian","Pacific","Arctic"],c:2},
-{q:"42. Which country has the most pyramids?",o:["Mexico","Sudan","Egypt","Peru"],c:1},
-{q:"43. What is the capital of Russia?",o:["Kiev","Warsaw","Moscow","Paris"],c:2},
-{q:"44. How many bones in the human body?",o:["206","208","210","212"],c:0},
-{q:"45. Which is the largest volcano?",o:["Etna","Krakatoa","Mauna Loa","Vesuvius"],c:2},
-{q:"46. What is the national sport of Japan?",o:["Karate","Sumo","Judo","Kendo"],c:1},
-{q:"47. What is the main gas in the air?",o:["Oxygen","Nitrogen","CO2","Helium"],c:1},
-{q:"48. What is the capital of Canada?",o:["Ottawa","Toronto","Vancouver","Montreal"],c:0},
-{q:"49. Which planet is known for its rings?",o:["Mars","Earth","Saturn","Venus"],c:2},
-{q:"50. What is a group of lions called?",o:["Pack","Herd","Pride","School"],c:2},
-
-{q:"51. Which vitamin is in citrus fruits?",o:["A","B","C","D"],c:2},
-{q:"52. Who painted the Starry Night?",o:["Da Vinci","Picasso","Van Gogh","Rembrandt"],c:2},
-{q:"53. What is the capital of Italy?",o:["Rome","Venice","Milan","Florence"],c:0},
-{q:"54. Which natural resource powers houses?",o:["Coal","Wind","Solar","All of these"],c:3},
-{q:"55. What is the freezing point of water?",o:["0°C","32°C","50°C","100°C"],c:0},
-{q:"56. What is used to measure earthquakes?",o:["Barometer","Seismograph","Thermometer","Anemometer"],c:1},
-{q:"57. What is the largest bird?",o:["Ostrich","Eagle","Falcon","Parrot"],c:0},
-{q:"58. Who discovered America?",o:["Vasco da Gama","Magellan","Columbus","Cook"],c:2},
-{q:"59. Which is the smallest bone?",o:["Skull","Femur","Stapes","Spine"],c:2},
-{q:"60. Which is the national flower of India?",o:["Rose","Lotus","Lily","Tulip"],c:1},
-
-{q:"61. Which organ helps digest food?",o:["Heart","Stomach","Lungs","Kidney"],c:1},
-{q:"62. Which is the capital of China?",o:["Beijing","Shanghai","Hong Kong","Tibet"],c:0},
-{q:"63. Which is the longest bridge?",o:["Golden Gate","Danyang–Kunshan","Brooklyn","London"],c:1},
-{q:"64. Which sea is shrinking?",o:["Red Sea","Black Sea","Aral Sea","Dead Sea"],c:2},
-{q:"65. Which is the largest lake?",o:["Superior","Victoria","Baikal","Tahoe"],c:2},
-{q:"66. Which country has the most islands?",o:["Indonesia","Australia","Japan","Philippines"],c:0},
-{q:"67. What is the main language of Brazil?",o:["Spanish","Portuguese","French","English"],c:1},
-{q:"68. Which is the largest mosque in India?",o:["Jama Masjid","Mecca Masjid","Taj-ul-Masjid","Tipu Masjid"],c:2},
-{q:"69. Which is the longest river in India?",o:["Yamuna","Ganga","Godavari","Krishna"],c:2},
-{q:"70. Which planet is known as the evening star?",o:["Mercury","Venus","Mars","Jupiter"],c:1},
-
-{q:"71. Who invented the World Wide Web?",o:["Bill Gates","Tim Berners‑Lee","Steve Jobs","Mark Zuckerberg"],c:1},
-{q:"72. Which is the national animal of Australia?",o:["Kangaroo","Koala","Dingo","Emu"],c:0},
-{q:"73. Which instrument controls heartbeat?",o:["EEG","ECG","MRI","X‑ray"],c:1},
-{q:"74. Which is the longest tunnel?",o:["Channel Tunnel","Seikan Tunnel","Gotthard Tunnel","Lærdal Tunnel"],c:3},
-{q:"75. Which country has the most UNESCO sites?",o:["China","Italy","India","Spain"],c:0},
-{q:"76. What is the chemical symbol for gold?",o:["Ag","Au","Fe","Pb"],c:1},
-{q:"77. Which part of the eye helps focus?",o:["Retina","Lens","Iris","Cornea"],c:1},
-{q:"78. Which is the hottest continent?",o:["Africa","Asia","Australia","Europe"],c:0},
-{q:"79. Where is the Taj Mahal located?",o:["Mumbai","Delhi","Agra","Lucknow"],c:2},
-{q:"80. Which is largest bay?",o:["Bay of Bengal","Hudson Bay","Gulf of Mexico","Arabian Sea"],c:0},
-
-{q:"81. What is Earth's primary source of energy?",o:["Wind","Water","Sun","Geothermal"],c:2},
-{q:"82. Which instrument measures air pressure?",o:["Thermometer","Barometer","Altimeter","Hygrometer"],c:1},
-{q:"83. Which gas is essential for fire?",o:["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"],c:0},
-{q:"84. Which flower is national flower of Japan?",o:["Lotus","Rose","Cherry Blossom","Lily"],c:2},
-{q:"85. What is the largest artery?",o:["Aorta","Pulmonary","Carotid","Femoral"],c:0},
-{q:"86. Which is largest rainforest?",o:["Amazon","Congo","Sundarbans","Daintree"],c:0},
-{q:"87. Which state in India has highest population?",o:["Maharashtra","UP","Bihar","West Bengal"],c:1},
-{q:"88. Which is longest natural bridge?",o:["Rainbow Bridge","Scenic Bridge","Xian Bridge","Kolob Arch"],c:3},
-{q:"89. Which is the capital of Mexico?",o:["Monterrey","Guadalajara","Mexico City","Cancun"],c:2},
-{q:"90. Who invented penicillin?",o:["Fleming","Curie","Einstein","Newton"],c:0},
-
-{q:"91. Which is the longest free‑standing structure?",o:["Eiffel Tower","CN Tower","Burj Khalifa","Tokyo Tower"],c:2},
-{q:"92. Which animal can sleep standing?",o:["Horse","Elephant","Lion","Tiger"],c:0},
-{q:"93. Which is largest delta?",o:["Nile Delta","Ganges Delta","Mekong Delta","Danube Delta"],c:1},
-{q:"94. Which is the symbol for potassium?",o:["K","P","Pt","Po"],c:0},
-{q:"95. Which sport uses shuttlecock?",o:["Table Tennis","Badminton","Cricket","Golf"],c:1},
-{q:"96. Which is the capital of Egypt?",o:["Cairo","Giza","Alexandria","Luxor"],c:0},
-{q:"97. Which planet has hottest surface?",o:["Venus","Mercury","Mars","Jupiter"],c:0},
-{q:"98. Who painted the Sistine Chapel ceiling?",o:["Raphael","Da Vinci","Michelangelo","Botticelli"],c:2},
-{q:"99. Which is the largest church?",o:["St. Peter's","Notre Dame","Westminster","Sagrada Familia"],c:0},
-{q:"100. Which sea is between Europe and Africa?",o:["Red Sea","Black Sea","Mediterranean","Baltic"],c:2}
-
+{q:"2. Largest planet in our solar system?",o:["Earth","Mars","Jupiter","Saturn"],c:2},
+{q:"3. Who invented the telephone?",o:["Bell","Edison","Tesla","Newton"],c:0},
+{q:"4. What is the largest ocean?",o:["Atlantic","Indian","Pacific","Arctic"],c:2},
+{q:"5. Which animal is called 'Ship of the Desert'?",o:["Camel","Horse","Elephant","Dog"],c:0},
+{q:"6. Who wrote 'Romeo and Juliet'?",o:["Shakespeare","Dickens","Twain","Hemingway"],c:0},
+{q:"7. What gas do humans breathe?",o:["Oxygen","Hydrogen","Carbon Dioxide","Nitrogen"],c:0},
+{q:"8. Which is the tallest mountain?",o:["K2","Everest","Kanchenjunga","Makalu"],c:1},
+{q:"9. Who discovered penicillin?",o:["Fleming","Curie","Newton","Darwin"],c:0},
+{q:"10. What is H2O?",o:["Oxygen","Hydrogen","Water","Carbon Dioxide"],c:2},
+{q:"11. Capital of Japan?",o:["Seoul","Tokyo","Beijing","Bangkok"],c:1},
+{q:"12. Largest mammal?",o:["Elephant","Blue Whale","Giraffe","Shark"],c:1},
+{q:"13. Which is the fastest land animal?",o:["Lion","Tiger","Cheetah","Leopard"],c:2},
+{q:"14. How many continents?",o:["5","6","7","8"],c:2},
+{q:"15. National flower of India?",o:["Rose","Lotus","Lily","Tulip"],c:1},
+{q:"16. Largest desert?",o:["Sahara","Gobi","Thar","Kalahari"],c:0},
+{q:"17. Who painted the Mona Lisa?",o:["Da Vinci","Van Gogh","Picasso","Rembrandt"],c:0},
+{q:"18. Which planet is known as the Red Planet?",o:["Earth","Mars","Venus","Jupiter"],c:1},
+{q:"19. Who was first President of the USA?",o:["Lincoln","Washington","Jefferson","Adams"],c:1},
+{q:"20. Which is the smallest prime number?",o:["0","1","2","3"],c:2},
+{q:"21. Capital of France?",o:["Paris","Berlin","Rome","Madrid"],c:0},
+{q:"22. Largest river in India?",o:["Ganga","Yamuna","Godavari","Krishna"],c:0},
+{q:"23. Who discovered electricity?",o:["Tesla","Faraday","Edison","Volta"],c:1},
+{q:"24. Largest bird?",o:["Ostrich","Eagle","Falcon","Parrot"],c:0},
+{q:"25. Which gas is essential for fire?",o:["Oxygen","Hydrogen","Carbon Dioxide","Nitrogen"],c:0},
+{q:"26. Which is the hottest planet?",o:["Venus","Mercury","Mars","Jupiter"],c:0},
+{q:"27. Largest island?",o:["Greenland","Borneo","Madagascar","Sri Lanka"],c:0},
+{q:"28. National animal of Australia?",o:["Kangaroo","Koala","Dingo","Emu"],c:0},
+{q:"29. Which element is 'Au'?",o:["Gold","Silver","Iron","Copper"],c:0},
+{q:"30. Which ocean is the deepest?",o:["Atlantic","Indian","Pacific","Arctic"],c:2},
 ];
 
 let current=0, score=0, timeLeft=20, timer;
+let playerName="";
 
+// Start Quiz
+function startQuiz(){
+  playerName = document.getElementById('playerInput').value || "Player";
+  document.getElementById('playerName').innerText = "Player: "+playerName;
+  document.getElementById('startBox').style.display="none";
+  document.getElementById('quizBox').style.display="block";
+  loadQuestion();
+}
+
+// Timer
 function startTimer(){
   clearInterval(timer);
-  timeLeft = 20;
+  timeLeft=20;
   document.getElementById("timer").innerText = "⏱ Time: "+timeLeft;
-  timer = setInterval(()=>{
+  timer=setInterval(()=>{
     timeLeft--;
     document.getElementById("timer").innerText = "⏱ Time: "+timeLeft;
-    if(timeLeft <= 0){ checkAnswer(-1); }
+    if(timeLeft<=0){ checkAnswer(-1); }
   },1000);
 }
 
+// Load Question
 function loadQuestion(){
   startTimer();
   let q = questions[current];
@@ -204,24 +132,31 @@ function loadQuestion(){
   for(let i=0;i<4;i++){
     document.getElementById("opt"+i).innerText = q.o[i];
   }
-  document.getElementById("progressBar").style.width = ((current)/100)*100+"%";
+  document.getElementById("progressBar").style.width = (current/30)*100+"%";
   document.getElementById("score").innerText = "Score: "+score;
 }
 
+// Check Answer
 function checkAnswer(i){
   clearInterval(timer);
-  if(i === questions[current].c){ score++; }
+  let correct = questions[current].c;
+  if(i === correct){ score++; document.getElementById("correctSound").play(); }
+  else{ document.getElementById("wrongSound").play(); }
   current++;
-  if(current < questions.length){
-    loadQuestion();
-  } else {
-    document.getElementById("question").innerText="Quiz Completed!";
-    document.getElementById("scoreBoard").style.display="block";
-    document.getElementById("scoreBoard").innerHTML="🏆 Final Score: "+score+" / 100";
-    document.getElementById("restartBtn").style.display="block";
-  }
+  if(current < questions.length){ loadQuestion(); }
+  else{ finishQuiz(); }
 }
 
+// Finish Quiz
+function finishQuiz(){
+  document.getElementById("question").innerText="🏁 Quiz Completed!";
+  document.getElementById("scoreBoard").style.display="block";
+  document.getElementById("scoreBoard").innerHTML = "🏆 "+playerName+"'s Score: "+score+" / 30";
+  document.getElementById("restartBtn").style.display="block";
+  confettiEffect();
+}
+
+// Restart
 function restartQuiz(){
   current=0; score=0;
   document.getElementById("scoreBoard").style.display="none";
@@ -229,8 +164,24 @@ function restartQuiz(){
   loadQuestion();
 }
 
-loadQuestion();
-
+// Confetti Effect
+function confettiEffect(){
+  let colors = ["#ff0","#0ff","#f0f","#0f0","#f00","#00f"];
+  for(let i=0;i<100;i++){
+    let div = document.createElement("div");
+    div.style.position="fixed";
+    div.style.width="10px";
+    div.style.height="10px";
+    div.style.background = colors[Math.floor(Math.random()*colors.length)];
+    div.style.left = Math.random()*window.innerWidth+"px";
+    div.style.top = Math.random()*window.innerHeight+"px";
+    div.style.opacity=0.7;
+    div.style.borderRadius="50%";
+    div.style.zIndex=9999;
+    document.body.appendChild(div);
+    setTimeout(()=>div.remove(),2000+Math.random()*2000);
+  }
+}
 </script>
 
 </body>
