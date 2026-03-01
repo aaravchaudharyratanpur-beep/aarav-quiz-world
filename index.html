@@ -6,10 +6,10 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: linear-gradient(135deg,#141E30,#243B55);
-      color:white;
-      margin:0;
-      padding:0;
+      background: linear-gradient(135deg, #141E30, #243B55);
+      color: white;
+      margin: 0;
+      padding: 0;
     }
     .quiz-box {
       background: rgba(255,255,255,0.1);
@@ -31,42 +31,46 @@
       cursor: pointer;
       font-size: 16px;
     }
-    button:hover { background:#00a3cc; }
-    .progress { height:15px; background:#333; border-radius:10px; margin:15px 0; }
-    .progress-bar { height:100%; width:0%; background:#00ff9d; }
-    #restartBtn { display:none; background:#ff4081; color:white; }
-    #scoreBoard { display:none; font-size:22px; margin-top:15px; }
-    #playerInput { margin:20px auto; padding:10px; font-size:16px; width:300px; border-radius:10px; border:none; }
+    button:hover {
+      background: #00a3cc;
+    }
+    .progress {
+      height: 15px;
+      background: #333;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #00ff9d;
+    }
+    #restartBtn { display: none; background: #ff4081; color: white; }
+    #scoreBoard { display: none; font-size: 22px; margin-top: 15px; }
   </style>
 </head>
+
 <body>
 
-<div class="quiz-box" id="startBox">
+<div class="quiz-box">
   <h2>🔥 AARAV QUIZ WORLD 🔥</h2>
-  <input type="text" placeholder="Enter your name" id="playerInput">
-  <button onclick="startQuiz()">Start Quiz</button>
-</div>
-
-<div class="quiz-box" id="quizBox" style="display:none;">
-  <h2 id="playerName"></h2>
   <div id="timer">⏱ Time: 20</div>
   <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
   <h3 id="question">Question text</h3>
+
   <button onclick="checkAnswer(0)" id="opt0">Option 1</button>
   <button onclick="checkAnswer(1)" id="opt1">Option 2</button>
   <button onclick="checkAnswer(2)" id="opt2">Option 3</button>
   <button onclick="checkAnswer(3)" id="opt3">Option 4</button>
+
   <p id="score">Score: 0</p>
+
   <div id="scoreBoard"></div>
   <button id="restartBtn" onclick="restartQuiz()">🔁 Play Again</button>
 </div>
 
-<!-- Sound Effects -->
-<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
-
 <script>
-// 100 GK Questions
 let questions = [
 {q:"1. What is the capital of India?",o:["Mumbai","Delhi","Chennai","Kolkata"],c:1},
 {q:"2. Which is the largest planet in our solar system?",o:["Earth","Mars","Jupiter","Saturn"],c:2},
@@ -178,31 +182,21 @@ let questions = [
 {q:"99. Which is the largest church?",o:["St. Peter's","Notre Dame","Westminster","Sagrada Familia"],c:0},
 {q:"100. Which sea is between Europe and Africa?",o:["Red Sea","Black Sea","Mediterranean","Baltic"],c:2}
 
+];
+
 let current=0, score=0, timeLeft=20, timer;
-let playerName="";
 
-// Start Quiz
-function startQuiz(){
-  playerName = document.getElementById('playerInput').value || "Player";
-  document.getElementById('playerName').innerText = "Player: "+playerName;
-  document.getElementById('startBox').style.display="none";
-  document.getElementById('quizBox').style.display="block";
-  loadQuestion();
-}
-
-// Timer
 function startTimer(){
   clearInterval(timer);
-  timeLeft=20;
+  timeLeft = 20;
   document.getElementById("timer").innerText = "⏱ Time: "+timeLeft;
-  timer=setInterval(()=>{
+  timer = setInterval(()=>{
     timeLeft--;
     document.getElementById("timer").innerText = "⏱ Time: "+timeLeft;
-    if(timeLeft<=0){ checkAnswer(-1); }
+    if(timeLeft <= 0){ checkAnswer(-1); }
   },1000);
 }
 
-// Load Question
 function loadQuestion(){
   startTimer();
   let q = questions[current];
@@ -210,38 +204,24 @@ function loadQuestion(){
   for(let i=0;i<4;i++){
     document.getElementById("opt"+i).innerText = q.o[i];
   }
-  document.getElementById("progressBar").style.width = (current/100)*100+"%";
+  document.getElementById("progressBar").style.width = ((current)/100)*100+"%";
   document.getElementById("score").innerText = "Score: "+score;
 }
 
-// Check Answer
 function checkAnswer(i){
   clearInterval(timer);
-  let correct = questions[current].c;
-  if(i === correct){
-    score++;
-    document.getElementById("correctSound").play();
-  } else {
-    document.getElementById("wrongSound").play();
-  }
+  if(i === questions[current].c){ score++; }
   current++;
   if(current < questions.length){
     loadQuestion();
   } else {
-    finishQuiz();
+    document.getElementById("question").innerText="Quiz Completed!";
+    document.getElementById("scoreBoard").style.display="block";
+    document.getElementById("scoreBoard").innerHTML="🏆 Final Score: "+score+" / 100";
+    document.getElementById("restartBtn").style.display="block";
   }
 }
 
-// Finish Quiz
-function finishQuiz(){
-  document.getElementById("question").innerText="🏁 Quiz Completed!";
-  document.getElementById("scoreBoard").style.display="block";
-  document.getElementById("scoreBoard").innerHTML = "🏆 "+playerName+"'s Score: "+score+" / 100";
-  document.getElementById("restartBtn").style.display="block";
-  confettiEffect();
-}
-
-// Restart
 function restartQuiz(){
   current=0; score=0;
   document.getElementById("scoreBoard").style.display="none";
@@ -249,26 +229,9 @@ function restartQuiz(){
   loadQuestion();
 }
 
-// Simple Confetti
-function confettiEffect(){
-  let colors = ["#ff0","#0ff","#f0f","#0f0","#f00","#00f"];
-  for(let i=0;i<200;i++){
-    let div = document.createElement("div");
-    div.style.position="fixed";
-    div.style.width="10px";
-    div.style.height="10px";
-    div.style.background = colors[Math.floor(Math.random()*colors.length)];
-    div.style.left = Math.random()*window.innerWidth+"px";
-    div.style.top = Math.random()*window.innerHeight+"px";
-    div.style.opacity=0.7;
-    div.style.borderRadius="50%";
-    div.style.zIndex=9999;
-    document.body.appendChild(div);
-    setTimeout(()=>div.remove(),2000+Math.random()*2000);
-  }
-}
+loadQuestion();
+
 </script>
 
 </body>
 </html>
-
